@@ -1,0 +1,7 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "d:\\javagaming\\joml\\joml-1.10.7.jar",
+        "d:\\javagaming\\jogl\\jogamp-fat.jar"
+    ]
+}
