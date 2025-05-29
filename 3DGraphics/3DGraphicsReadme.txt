@@ -1,0 +1,1 @@
+Each of these projects uses the graphics libraries JOGL and JOML to run their programs through the OpenGL pipeline. Running them may be slightly difficult, but in general the run.bat file in each program should work for each corresponding one. The results may vary with the graphics card.
