@@ -1,0 +1,3 @@
+These projects are concurrent, each a continuation of the previous one. The overall project was not finished, but A3 is close. These projects use a library called Codename One. It is a simple game where the player, a red dot called an Ant, collects food from green squares around the screen while avoiding black triangles, spiders.
+
+Each project further established the proper structure of an object-oriented program, as the starter file creates the "game" that manages the UI, the commands, and the "gameworld" that creates and manages all in-game objects including the player, the food stations, and the spiders.
