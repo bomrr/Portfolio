@@ -1,0 +1,7 @@
+DROP TABLE sell;
+DROP TABLE consist_of;
+DROP TABLE drug;
+DROP TABLE prescription;
+DROP TABLE pharmacy;
+DROP TABLE ph_company;
+DROP TABLE doctor;

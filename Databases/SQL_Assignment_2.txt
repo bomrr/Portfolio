@@ -1,0 +1,164 @@
+CREATE TABLE doctor (
+	dssn VARCHAR(11) NOT NULL,
+	dname VARCHAR(20),
+	specialty VARCHAR(50),
+	PRIMARY KEY(dssn)
+);
+
+CREATE TABLE prescription(
+	dssn VARCHAR(11) NOT NULL,
+	pre_no VARCHAR(4) NOT NULL,
+	pdate DATE,
+	PRIMARY KEY(dssn, pre_no),
+	FOREIGN KEY(dssn) REFERENCES doctor(dssn)
+);
+
+CREATE TABLE ph_company(
+	pname VARCHAR(20) NOT NULL,
+	phone VARCHAR(15) NOT NULL,
+	PRIMARY KEY(PNAME)
+);
+
+CREATE TABLE drug (
+	pname VARCHAR(20) NOT NULL,
+	trade_name VARCHAR(20) NOT NULL,
+	formula VARCHAR(100) NOT NULL,
+	PRIMARY KEY(pname, trade_name),
+	FOREIGN KEY(pname) REFERENCES ph_company(pname)
+);
+
+CREATE TABLE consist_of(
+	dssn VARCHAR(11) NOT NULL,
+	pre_no VARCHAR(4) NOT NULL,
+	pname VARCHAR(20) NOT NULL,
+	trade_name VARCHAR(20) NOT NULL,
+    	PRIMARY KEY(dssn, pre_no, pname, trade_name),
+    	FOREIGN KEY(dssn, pre_no) REFERENCES prescription(dssn, pre_no),
+	FOREIGN KEY(pname, trade_name) REFERENCES drug(pname, trade_name)
+);
+
+CREATE TABLE pharmacy(
+	pcy_name VARCHAR(20) NOT NULL,
+	address VARCHAR(20),
+	phone VARCHAR(15),
+	PRIMARY KEY(pcy_name)
+);
+
+CREATE TABLE sell(
+	pharmacy_name VARCHAR(20) NOT NULL,
+	pname VARCHAR(20) NOT NULL,
+	trade_name VARCHAR(20) NOT NULL,
+	price VARCHAR(10),
+	PRIMARY KEY(pharmacy_name, pname, trade_name),
+	FOREIGN KEY(pharmacy_name) REFERENCES pharmacy(pcy_name),
+	FOREIGN KEY(pname, trade_name) REFERENCES drug(pname, trade_name)
+);
+
+INSERT INTO doctor (dssn, dname, specialty) 
+VALUES ('12345678910', 'Mark', 'Blood');
+INSERT INTO doctor (dssn, dname, specialty) 
+VALUES ('56456234561', 'Kate Elmasri', 'Drugs');
+
+INSERT INTO prescription (dssn, pre_no, pdate) 
+VALUES ('12345678910', '5436', '2003-12-08');
+INSERT INTO prescription (dssn, pre_no, pdate) 
+VALUES ('56456234561', '5875', '2004-01-15');
+INSERT INTO prescription (dssn, pre_no, pdate)
+VALUES ('56456234561', '6789', '2023-05-16');
+
+INSERT INTO ph_company (pname, phone) 
+VALUES ('Phizer', '123-456-7890');
+INSERT INTO ph_company (pname, phone) 
+VALUES ('Advil', '123-530-4571');
+INSERT INTO ph_company (pname, phone)
+VALUES ('Walgreens', '123-563-3388');
+
+INSERT INTO drug(pname, trade_name, formula)
+VALUES ('Phizer', 'Ibuprofen', 'sh0sle49');
+INSERT INTO drug(pname, trade_name, formula)
+VALUES ('Phizer', 'these', 'Zoodler');
+INSERT INTO drug(pname, trade_name, formula)
+VALUES ('Phizer', 'that', 'Some_formula');
+INSERT INTO drug(pname, trade_name, formula)
+VALUES ('Advil', 'things', 'A_formula');
+INSERT INTO drug(pname, trade_name, formula)
+VALUES ('Advil', 'Ibuprofen', 'Another_formula');
+INSERT INTO drug(pname, trade_name, formula)
+VALUES ('Walgreens', 'Ibuprofen', 'A_formula');
+INSERT INTO drug(pname, trade_name, formula)
+VALUES ('Walgreens', 'these', 'This_formula');
+
+INSERT INTO consist_of(dssn, pre_no, pname, trade_name)
+VALUES ('12345678910', '5436', 'Phizer', 'Ibuprofen');
+INSERT INTO consist_of(dssn, pre_no, pname, trade_name)
+VALUES ('56456234561', '5875', 'Phizer', 'these');
+INSERT INTO consist_of (dssn, pre_no, pname, trade_name)
+VALUES ('56456234561', '6789', 'Advil', 'things');
+
+INSERT INTO pharmacy(pcy_name, address, phone)
+VALUES ('Pharm', 'things-street', '123-456-7890');
+INSERT INTO pharmacy(pcy_name, address, phone)
+VALUES ('Walmart', 'another_street', '124-543-7678');
+
+INSERT INTO sell(pharmacy_name, pname, trade_name, price)
+VALUES ('Pharm', 'Advil', 'Ibuprofen', '$4235');
+INSERT INTO sell(pharmacy_name, pname, trade_name, price)
+VALUES ('Pharm', 'Phizer', 'that', '$5000');
+INSERT INTO sell(pharmacy_name, pname, trade_name, price)
+VALUES ('Pharm', 'Phizer', 'Ibuprofen', '$4235');
+INSERT INTO sell(pharmacy_name, pname, trade_name, price)
+VALUES ('Walmart', 'Walgreens', 'these', '$5000');
+INSERT INTO sell(pharmacy_name, pname, trade_name, price)
+VALUES ('Walmart', 'Walgreens', 'Ibuprofen', '$5500');
+INSERT INTO sell(pharmacy_name, pname, trade_name, price)
+VALUES ('Walmart', 'Phizer', 'that', '$6000');
+
+
+SELECT trade_name, formula
+FROM drug
+WHERE pname = 'Phizer'
+ORDER BY trade_name DESC;
+
+SELECT DISTINCT d.pname, d.trade_name, d.formula
+FROM drug AS d, consist_of as c, prescription as p
+WHERE d.pname = c.pname AND d.trade_name = c.trade_name AND c.dssn = p.dssn AND c.pre_no = p.pre_no
+GROUP BY d.pname, d.trade_name, d.formula
+HAVING COUNT(*) > 0;
+
+SELECT c.trade_name, c.pname, p.pdate
+FROM prescription AS p JOIN doctor as d ON d.dssn = p.dssn
+JOIN consist_of as c ON p.dssn = c.dssn AND p.pre_no = c.pre_no
+WHERE d.dname = 'Kate Elmasri';
+
+SELECT d.trade_name, d.formula
+FROM sell AS s
+JOIN drug AS d ON s.pname = d.pname AND s.trade_name = d.trade_name
+WHERE s.pharmacy_name = 'Walmart';
+
+SELECT COUNT(pname)
+FROM drug
+WHERE pname = 'Phizer';
+
+SELECT pcy_name, address
+FROM sell AS s
+JOIN pharmacy AS p ON s.pharmacy_name = p.pcy_name
+WHERE pcy_name = pharmacy_name AND trade_name = 'Ibuprofen' AND s.price = (
+    SELECT MAX(price)
+    FROM sell
+    WHERE trade_name = 'Ibuprofen'
+);
+
+SELECT pharmacy_name, COUNT(trade_name)
+FROM sell
+GROUP BY pharmacy_name
+HAVING COUNT(trade_name) > 2;
+
+
+
+DROP TABLE sell;
+DROP TABLE consist_of;
+DROP TABLE drug;
+DROP TABLE prescription;
+DROP TABLE pharmacy;
+DROP TABLE ph_company;
+DROP TABLE doctor;
