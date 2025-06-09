@@ -1,0 +1,48 @@
+CREATE TABLE doctor (
+	dssn VARCHAR(11) NOT NULL,
+	dname VARCHAR(20),
+	specialty VARCHAR(50),
+	PRIMARY KEY(dssn)
+);
+CREATE TABLE prescription(
+	dssn VARCHAR(11) NOT NULL,
+	pre_no VARCHAR(4) NOT NULL,
+	pdate DATE,
+	PRIMARY KEY(dssn, pre_no),
+	FOREIGN KEY(dssn) REFERENCES doctor(dssn)
+);
+CREATE TABLE ph_company(
+	pname VARCHAR(20) NOT NULL,
+	phone VARCHAR(15) NOT NULL,
+	PRIMARY KEY(PNAME)
+);
+CREATE TABLE drug (
+	pname VARCHAR(20) NOT NULL,
+	trade_name VARCHAR(20) NOT NULL,
+	formula VARCHAR(100) NOT NULL,
+	PRIMARY KEY(pname, trade_name),
+	FOREIGN KEY(pname) REFERENCES ph_company(pname)
+);
+CREATE TABLE consist_of(
+	dssn VARCHAR(11) NOT NULL,
+	pre_no VARCHAR(4) NOT NULL,
+	pname VARCHAR(20) NOT NULL,
+	trade_name VARCHAR(20) NOT NULL,
+    	PRIMARY KEY(dssn, pre_no, pname, trade_name),
+    	FOREIGN KEY(dssn, pre_no) REFERENCES prescription(dssn, pre_no),
+	FOREIGN KEY(pname, trade_name) REFERENCES drug(pname, trade_name)
+);
+CREATE TABLE pharmacy(
+	pcy_name VARCHAR(20) NOT NULL,
+	address VARCHAR(20),
+	phone VARCHAR(15),
+	PRIMARY KEY(pcy_name)
+);
+CREATE TABLE sell(
+	pharmacy_name VARCHAR(20) NOT NULL,
+	pname VARCHAR(20) NOT NULL,
+	trade_name VARCHAR(20) NOT NULL,
+	price VARCHAR(10),
+	PRIMARY KEY(pharmacy_name, pname, trade_name),
+	FOREIGN KEY(pharmacy_name) REFERENCES pharmacy(pcy_name)
+);

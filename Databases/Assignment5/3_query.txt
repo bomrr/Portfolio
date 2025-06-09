@@ -1,0 +1,38 @@
+SELECT trade_name, formula
+FROM drug
+WHERE pname = 'Phizer'
+ORDER BY trade_name DESC;
+
+SELECT DISTINCT d.pname, d.trade_name, d.formula
+FROM drug AS d, consist_of as c, prescription as p
+WHERE d.pname = c.pname AND d.trade_name = c.trade_name AND c.dssn = p.dssn AND c.pre_no = p.pre_no
+GROUP BY d.pname, d.trade_name, d.formula
+HAVING COUNT(*) > 0;
+
+SELECT c.trade_name, c.pname, p.pdate
+FROM prescription AS p JOIN doctor as d ON d.dssn = p.dssn
+JOIN consist_of as c ON p.dssn = c.dssn AND p.pre_no = c.pre_no
+WHERE d.dname = 'Kate Elmasri';
+
+SELECT d.trade_name, d.formula
+FROM sell AS s
+JOIN drug AS d ON s.pname = d.pname AND s.trade_name = d.trade_name
+WHERE s.pharmacy_name = 'Walmart';
+
+SELECT COUNT(pname)
+FROM drug
+WHERE pname = 'Phizer';
+
+SELECT pcy_name, address
+FROM sell AS s
+JOIN pharmacy AS p ON s.pharmacy_name = p.pcy_name
+WHERE pcy_name = pharmacy_name AND trade_name = 'Ibuprofen' AND s.price = (
+    SELECT MAX(price)
+    FROM sell
+    WHERE trade_name = 'Ibuprofen'
+);
+
+SELECT pharmacy_name, COUNT(trade_name)
+FROM sell
+GROUP BY pharmacy_name
+HAVING COUNT(trade_name) > 2;
